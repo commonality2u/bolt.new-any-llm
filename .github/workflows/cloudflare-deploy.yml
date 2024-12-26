@@ -48,6 +48,7 @@ jobs:
           VITE_APP_VERSION: ${{ github.sha }}
           NODE_ENV: production
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 
       - name: Check build directory
         run: |
