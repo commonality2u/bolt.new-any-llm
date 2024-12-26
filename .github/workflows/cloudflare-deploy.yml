@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     name: Deploy to Cloudflare Pages
     steps:
       - uses: actions/checkout@v4
@@ -22,7 +22,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: latest
+          version: 9.4.0
           run_install: false
 
       - name: Get pnpm store directory
@@ -54,14 +54,12 @@ jobs:
         run: |
           echo "Checking build directory structure:"
           ls -la
-          echo "Public directory contents:"
-          ls -la public || echo "public directory not found"
-          echo "Dist directory contents:"
-          ls -la dist || echo "dist directory not found"
+          echo "Build directory contents:"
+          ls -la build/client || echo "build/client directory not found"
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=my-bltdiy --commit-dirty=true
+          command: pages deploy build/client --project-name=my-bltdiy --commit-dirty=true
