@@ -6,6 +6,11 @@ main = "./build/client/index.js"
 
 [pages]
 build_output_dir = "build/client"
+pages_build_output_dir = "build/client"
+
+[build]
+command = "pnpm run build"
+output_dir = "build/client"
 
 [env.production]
 name = "my-bltdiy-production"
