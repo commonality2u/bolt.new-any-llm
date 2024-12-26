@@ -53,14 +53,14 @@ jobs:
         run: |
           echo "Checking build directory structure:"
           ls -la
-          echo "Build directory contents:"
-          ls -la build || echo "build directory not found"
-          echo "Client directory contents:"
-          ls -la build/client || echo "client directory not found"
+          echo "Public directory contents:"
+          ls -la public || echo "public directory not found"
+          echo "Dist directory contents:"
+          ls -la dist || echo "dist directory not found"
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy ./build/client --project-name=my-bltdiy --commit-dirty=true
+          command: pages deploy dist --project-name=my-bltdiy --commit-dirty=true
