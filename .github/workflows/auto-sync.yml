@@ -1,0 +1,144 @@
+name: Auto Sync with Upstream
+
+on:
+  schedule:
+    # Run daily at 2 AM UTC (adjust this time as needed)
+    - cron: '0 2 * * *'
+  
+  # Sync when opening the repository in Codespaces or when explicitly triggered
+  workflow_dispatch:
+  
+  # Sync when pushing to main (ensures up-to-date before new changes)
+  push:
+    branches:
+      - main
+  
+  # Sync when creating/reopening a PR (ensures up-to-date for PR work)
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  sync:
+    name: Sync with Upstream
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+      
+      - name: Configure Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+      
+      - name: Add Upstream Remote
+        run: |
+          git remote add upstream https://github.com/coleam00/bolt.new-any-llm.git || true
+      
+      - name: Fetch Upstream
+        run: |
+          git fetch upstream
+      
+      - name: Check for Conflicts
+        id: check_conflicts
+        run: |
+          if git merge-tree $(git merge-base HEAD upstream/main) HEAD upstream/main | grep -e "^<<<<<<<<" -e "^>>>>>>>>" > /dev/null; then
+            echo "has_conflicts=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_conflicts=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Sync with Upstream (No Conflicts)
+        if: steps.check_conflicts.outputs.has_conflicts == 'false'
+        run: |
+          # Ensure we're on main
+          git checkout main
+          
+          # Merge upstream changes
+          git merge upstream/main
+          
+          # Push changes
+          git push origin main
+      
+      - name: Create Issue (If Conflicts)
+        if: steps.check_conflicts.outputs.has_conflicts == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issueTitle = "⚠️ Merge Conflicts Detected in Auto-Sync";
+            const issueBody = `
+            The auto-sync workflow has detected merge conflicts while attempting to sync with the upstream repository.
+
+            **Action Required:**
+            1. Please manually sync your fork with the upstream repository
+            2. Resolve the conflicts locally
+            3. Push the resolved changes
+
+            You can do this with the following commands:
+            \`\`\`bash
+            git fetch upstream
+            git checkout main
+            git merge upstream/main
+            # Resolve conflicts
+            git push origin main
+            \`\`\`
+
+            This issue will be closed automatically on the next successful sync.
+            `;
+
+            // Check if an issue already exists
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: ['auto-sync-conflict']
+            });
+
+            if (issues.data.length === 0) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: issueTitle,
+                body: issueBody,
+                labels: ['auto-sync-conflict']
+              });
+            }
+
+      - name: Close Resolved Conflict Issues
+        if: steps.check_conflicts.outputs.has_conflicts == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: ['auto-sync-conflict']
+            });
+
+            for (const issue of issues.data) {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                state: 'closed'
+              });
+            }
+
+      - name: Notify on Success
+        if: steps.check_conflicts.outputs.has_conflicts == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { sha } = context;
+            const shortSha = sha.substring(0, 7);
+            
+            await github.rest.repos.createCommitComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: sha,
+              body: `✅ Successfully synced with upstream at ${new Date().toISOString()}`
+            }); 
