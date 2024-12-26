@@ -1,6 +1,20 @@
 #:schema node_modules/wrangler/config-schema.json
-name = "bolt"
+name = "my-bltdiy"
 compatibility_flags = ["nodejs_compat"]
-compatibility_date = "2024-07-01"
+compatibility_date = "2024-01-01"
 pages_build_output_dir = "./build/client"
 send_metrics = false
+
+[site]
+bucket = "./build/client"
+entry-point = "."
+
+[build]
+command = "pnpm run build"
+watch_dir = "build/client"
+
+[env.production]
+name = "my-bltdiy-production"
+
+[env.preview]
+name = "my-bltdiy-preview"
