@@ -49,6 +49,15 @@ jobs:
           NODE_ENV: production
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
+      - name: Check build directory
+        run: |
+          echo "Checking build directory structure:"
+          ls -la
+          echo "Build directory contents:"
+          ls -la build || echo "build directory not found"
+          echo "Client directory contents:"
+          ls -la build/client || echo "client directory not found"
+
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
