@@ -16,7 +16,6 @@ const getGitHash = () => {
   }
 };
 
-
 export default defineConfig((config) => {
   return {
     define: {
@@ -36,7 +35,7 @@ export default defineConfig((config) => {
           v3_fetcherPersist: true,
           v3_relativeSplatPath: true,
           v3_throwAbortReason: true,
-          v3_lazyRouteDiscovery: true
+          v3_lazyRouteDiscovery: true,
         },
       }),
       UnoCSS(),
@@ -45,20 +44,20 @@ export default defineConfig((config) => {
       config.mode === 'production' && optimizeCssModules({ apply: 'build' }),
     ],
     envPrefix: [
-      "VITE_",
-      "OPENAI_LIKE_API_BASE_URL",
-      "OPENAI_LIKE_API_",
-      "OLLAMA_API_BASE_URL",
-      "LMSTUDIO_API_BASE_URL",
-      "TOGETHER_API_BASE_URL",
-      "ANTHROPIC_API_KEY",
-      "OPENAI_API_KEY",
-      "GROQ_API_KEY",
-      "OPEN_ROUTER_API_KEY",
-      "GOOGLE_GENERATIVE_AI_API_KEY",
-      "DEEPSEEK_API_KEY",
-      "MISTRAL_API_KEY",
-      "XAI_API_KEY"
+      'VITE_',
+      'OPENAI_LIKE_API_BASE_URL',
+      'OPENAI_LIKE_API_',
+      'OLLAMA_API_BASE_URL',
+      'LMSTUDIO_API_BASE_URL',
+      'TOGETHER_API_BASE_URL',
+      'ANTHROPIC_API_KEY',
+      'OPENAI_API_KEY',
+      'GROQ_API_KEY',
+      'OPEN_ROUTER_API_KEY',
+      'GOOGLE_GENERATIVE_AI_API_KEY',
+      'DEEPSEEK_API_KEY',
+      'MISTRAL_API_KEY',
+      'XAI_API_KEY',
     ],
     css: {
       preprocessorOptions: {

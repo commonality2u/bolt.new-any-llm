@@ -4,15 +4,15 @@ on:
   schedule:
     # Run daily at 2 AM UTC (adjust this time as needed)
     - cron: '0 2 * * *'
-  
+
   # Sync when opening the repository in Codespaces or when explicitly triggered
   workflow_dispatch:
-  
+
   # Sync when pushing to main (ensures up-to-date before new changes)
   push:
     branches:
       - main
-  
+
   # Sync when creating/reopening a PR (ensures up-to-date for PR work)
   pull_request:
     types: [opened, reopened]
@@ -21,27 +21,27 @@ jobs:
   sync:
     name: Sync with Upstream
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: main
-      
+
       - name: Configure Git
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-      
+
       - name: Add Upstream Remote
         run: |
           git remote add upstream https://github.com/coleam00/bolt.new-any-llm.git || true
-      
+
       - name: Fetch Upstream
         run: |
           git fetch upstream
-      
+
       - name: Check for Conflicts
         id: check_conflicts
         run: |
@@ -50,19 +50,19 @@ jobs:
           else
             echo "has_conflicts=false" >> $GITHUB_OUTPUT
           fi
-      
+
       - name: Sync with Upstream (No Conflicts)
         if: steps.check_conflicts.outputs.has_conflicts == 'false'
         run: |
           # Ensure we're on main
           git checkout main
-          
+
           # Merge upstream changes
           git merge upstream/main
-          
+
           # Push changes
           git push origin main
-      
+
       - name: Create Issue (If Conflicts)
         if: steps.check_conflicts.outputs.has_conflicts == 'true'
         uses: actions/github-script@v7
@@ -135,10 +135,10 @@ jobs:
           script: |
             const { sha } = context;
             const shortSha = sha.substring(0, 7);
-            
+
             await github.rest.repos.createCommitComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               commit_sha: sha,
               body: `✅ Successfully synced with upstream at ${new Date().toISOString()}`
-            }); 
+            });
