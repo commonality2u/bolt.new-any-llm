@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install PNPM
+      - name: Setup PNPM
         uses: pnpm/action-setup@v2
         with:
           version: 8
@@ -33,7 +33,7 @@ jobs:
       - name: Setup pnpm cache
         uses: actions/cache@v4
         with:
-          path: (${{ runner.os }}-pnpm-store-) 
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
@@ -48,6 +48,7 @@ jobs:
           NODE_ENV: production
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          NPM_CONFIG_USERCONFIG: ".npmrc"
 
       - name: Check build directory
         run: |
@@ -65,3 +66,4 @@ jobs:
           directory: build/client
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
           wranglerVersion: '3.99.0'
+          packageManager: "pnpm"

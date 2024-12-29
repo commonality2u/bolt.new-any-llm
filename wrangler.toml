@@ -8,8 +8,13 @@ bucket = "./build/client"
 entry-point = "functions/[[path]].ts"
 
 [build]
-command = "pnpm run build"
+command = "pnpm install && pnpm run build"
 pages_build_output_dir = "build/client"
+
+[build.environment]
+NODE_VERSION = "20"
+NPM_VERSION = "10"
+PNPM_VERSION = "8"
 
 [env.production]
 name = "my-bltdiy-prod"
