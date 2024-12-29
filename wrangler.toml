@@ -1,19 +1,18 @@
 #:schema node_modules/wrangler/config-schema.json
 name = "my-bltdiy"
-compatibility_flags = ["nodejs_compat"]
 compatibility_date = "2024-01-01"
-main = "./build/client/index.js"
+workers_dev = true
 
-[pages]
-build_output_dir = "build/client"
-pages_build_output_dir = "build/client"
+[site]
+bucket = "./build/client"
+entry-point = "functions/[[path]].ts"
 
 [build]
 command = "pnpm run build"
-output_dir = "build/client"
+pages_build_output_dir = "build/client"
 
 [env.production]
-name = "my-bltdiy-production"
+name = "my-bltdiy-prod"
 
-[env.preview]
-name = "my-bltdiy-preview"
+[env.staging]
+name = "my-bltdiy-staging"

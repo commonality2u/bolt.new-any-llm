@@ -1,16 +1,20 @@
-name: Deploy to Cloudflare Pages
+name: Auto Deploy Sync
 
 on:
-  push:
-    branches: [main]
+  schedule:
+    # Run daily at 4 AM UTC (after the 2 AM auto-sync)
+    - cron: '0 4 * * *'
+  
+  # Manual trigger for testing
   workflow_dispatch:
 
 jobs:
-  deploy:
-    runs-on: ubuntu-22.04
-    name: Deploy to Cloudflare Pages
+  check-and-deploy:
+    name: Check for Updates and Deploy
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -33,7 +37,7 @@ jobs:
       - name: Setup pnpm cache
         uses: actions/cache@v4
         with:
-          path: (${{ runner.os }}-pnpm-store-) 
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
@@ -64,4 +68,4 @@ jobs:
           projectName: my-bltdiy
           directory: build/client
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-          wranglerVersion: '3.99.0'
+          wranglerVersion: '3.99.0' 

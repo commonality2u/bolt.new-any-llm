@@ -5,15 +5,10 @@ on:
     # Run daily at 2 AM UTC (adjust this time as needed)
     - cron: '0 2 * * *'
 
-  # Sync when opening the repository in Codespaces or when explicitly triggered
+  # Manual trigger only
   workflow_dispatch:
 
-  # Sync when pushing to main (ensures up-to-date before new changes)
-  push:
-    branches:
-      - main
-
-  # Sync when creating/reopening a PR (ensures up-to-date for PR work)
+  # Sync when creating/reopening a PR
   pull_request:
     types: [opened, reopened]
 
@@ -60,8 +55,8 @@ jobs:
           # Merge upstream changes
           git merge upstream/main
 
-          # Push changes
-          git push origin main
+          # Push changes with [skip ci] to prevent deployment
+          git push origin main -o ci.skip
 
       - name: Create Issue (If Conflicts)
         if: steps.check_conflicts.outputs.has_conflicts == 'true'
