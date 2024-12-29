@@ -8,7 +8,7 @@ bucket = "./build/client"
 entry-point = "functions/[[path]].ts"
 
 [build]
-command = "pnpm install && pnpm run build"
+command = "corepack enable && corepack prepare pnpm@8 --activate && pnpm install && pnpm run build"
 pages_build_output_dir = "build/client"
 
 [build.environment]
